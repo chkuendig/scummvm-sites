@@ -15,7 +15,7 @@ return function (App $app) {
     $redis->connect($redisOptions['host'], $redisOptions['port'], $redisOptions['timeout'], '', 0, 0,['auth' => $redisOptions['auth']]);
     $app->add(
         \RateLimit\Middleware\RateLimitMiddleware::createDefault(
-            new \RateLimit\RedisRateLimiter($redis, 100, 15 * 60),
+            new \RateLimit\RedisRateLimiter($redis, 1000, 15 * 60),
             [
               'limitExceededHandler' => function ($request, $response) {
                 return $response->withJson(

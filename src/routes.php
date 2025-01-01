@@ -64,6 +64,15 @@ function getCloudProviderAndScope($settings)
 return function (App $app) {
     $container = $app->getContainer();
 
+    $app->add(function ($req, $res, $next) {
+        $response = $next($req, $res);
+        if (isset($_SERVER['HTTP_ORIGIN'])) {
+            $response = $response->withHeader('Access-Control-Allow-Origin', $_SERVER['HTTP_ORIGIN']) // this needs to be fixed or everybody can steal our tokens; also should only apply to the token endpoint
+            ->withHeader('Access-Control-Allow-Credentials', 'true');
+        }
+        return $response;
+    });
+    
     $app->get(
         '/', function (Request $request, Response $response, array $args) use ($container) {
             // Sample log message
@@ -74,6 +83,35 @@ return function (App $app) {
         }
     );
 
+    /**
+     * Get the OAuth response token from the php session. This method returns the token and clears the session. 
+     * - ScummVM Webassembly is polling this url regularly to check if the authorization has finished. If done, the token is immediately cleared
+     * - The Connect page is polling this url to check if the authorization has finished. If done, the frame can be closed.
+     * 
+     * Usually in a typical OAuth scenario this isn't needed as the connect page could communicate with the initiating page (ScummVM Webassembly) via sendMessage to transmit the token, 
+     * but since we are using pthreads, the Webassembly Page has to run with cross origin isolation to access SharedArrayBuffer. Which means that the two pages
+     * can't connect (even if they were on the same domain as the authentication redirects to the authentication provider, breaking the "same-origin". 
+     * This is a well known issues, see e.g. the notice at https://web.dev/articles/coop-coep#integrate_coop_and_coep. By using this separate endpoing, we can 
+     * work around this issue as the initiating page can poll this endpoint to get the token as long as the CORP (Cross-Origin-Resource-Policy) is set to cross-origin.
+     * 
+     * To avoid other pages from polling this endpoint, we only provide the token if the origin is the ScummVM Webassembly page.
+     */
+    $app->get(
+        '/response_token/', function (Request $request, Response $response, array $args) use ($container) {
+       
+            $response_json = (object) null;
+            if(/*isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === 'https://scummvm.org' &&*/ isset($_SESSION['response'] )){
+                $response_json = $_SESSION['response'];
+                
+                if($request->getQueryParam("clear", $default = 'false') === 'true'){
+                    unset($_SESSION['response']);
+                }
+            }
+
+            return $response
+            ->withJson($response_json);
+        }
+    );
     $app->get(
         '/{cloud}', function (Request $request, Response $response, array $args) use ($container) {
             $cloud = $args['cloud'];
@@ -123,6 +161,7 @@ return function (App $app) {
                         }
 
                         $response_json = ['error' => false, 'storage' => $settings['provider'], 'oauth' => $token];
+                        $_SESSION['response']   = $response_json;
                         return $container->get('renderer')->render($response, 'connect.phtml', ['response_base64' => base64_encode(json_encode($response_json)), 'provider_name' => $providerName]);
                     }
                     catch(League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {

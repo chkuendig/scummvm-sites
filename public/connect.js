@@ -6,6 +6,32 @@ window.onload = function () {
 function connect_cloud() {
     display_content("state_connecting");
 
+    // Poll until we get an empty response (meaning the token has been transferred) and close page at that point.
+    // TODO: This should check for the session age and wait for a certain amount of time before giving up (to avoid infinite loops) 
+    // based on the timeout in ScummVM
+    // TODO: This also should only be enabled for a "webassembly auth flow" (where it stays in "connecting" and doesn't fail immediately)
+    const intervalID = setInterval(async () => {
+        try {
+            const response = await fetch("/response_token/", { credentials: 'include' });
+            if (!response.ok) {
+              throw new Error(`Response status: ${response.status}`);
+            }
+        
+            const json = await response.json();
+            if(Object.keys(json).length == 0){
+                clearInterval(intervalID);
+                window.close();
+            }
+            console.log(json);
+          } catch (error) {
+            console.error(error.message);
+          }
+      }, 500);
+ 
+      
+
+
+
     var host = document.getElementById("host").value;
     if (host == "") host = "http://localhost:12345/";
 

@@ -11,7 +11,9 @@ if (PHP_SAPI == 'cli-server') {
 
 require __DIR__ . '/../vendor/autoload.php';
 
-session_start();
+session_start([
+    'cookie_lifetime' => 10*60, //10 minutes
+]);
 
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
