@@ -13,6 +13,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
+// Load environment variables
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
+$dotenv->safeLoad();
+
 // Instantiate the app
 $settings = include __DIR__ . '/../src/settings.php';
 $app = new \Slim\App($settings);

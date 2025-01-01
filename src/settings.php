@@ -19,34 +19,34 @@ return [
         // Dropbox settings
         'dropbox' => [
           'provider' => 'dropbox',
-          'client_id' => 'vgij09edeilbrtm',
+          'client_id' => getenv('DROPBOX_ID') ?: 'vgij09edeilbrtm',
           'client_secret' => getenv('DROPBOX_SECRET'),
-          'redirect_uri' => 'https://cloud.scummvm.org/dropbox',
+          'redirect_uri' => (getenv('REDIRECT_BASEURI') ?: 'https://cloud.scummvm.org').'/dropbox',
           'grant_type' => '',
         ],
 
         // Box settings
         'box' => [
           'provider' => 'box',
-          'client_id' => 'ep9cz17to1wakzqbq2a5jn5u01b0omxw',
+          'client_id' => getenv('BOX_ID') ?: 'ep9cz17to1wakzqbq2a5jn5u01b0omxw',
           'client_secret' => getenv('BOX_SECRET'),
-          'redirect_uri' => 'https://cloud.scummvm.org/box',
+          'redirect_uri' => (getenv('REDIRECT_BASEURI') ?: 'https://cloud.scummvm.org').'/box',
         ],
 
         // Google Drive settings
         'gdrive' => [
           'provider' => 'gdrive',
-          'client_id' => '201747806507-m6mclc7ijtp0v1fbj2qqehrdoh3uhofp.apps.googleusercontent.com',
+          'client_id' => getenv('GOOGLE_DRIVE_ID') ?: '201747806507-m6mclc7ijtp0v1fbj2qqehrdoh3uhofp.apps.googleusercontent.com',
           'client_secret' => getenv('GOOGLE_DRIVE_SECRET'),
-          'redirect_uri' => 'https://cloud.scummvm.org/gdrive',
+          'redirect_uri' => (getenv('REDIRECT_BASEURI') ?: 'https://cloud.scummvm.org').'/gdrive',
         ],
 
         // Onedrive settings
         'onedrive' => [
           'provider' => 'onedrive',
-          'client_id' => '12c88b6d-3037-4c0c-9076-cc4205cfb1d0',
+          'client_id' => getenv('ONEDRIVE_ID') ?: '12c88b6d-3037-4c0c-9076-cc4205cfb1d0',
           'client_secret' => getenv('ONEDRIVE_SECRET'),
-          'redirect_uri' => 'https://cloud.scummvm.org/onedrive',
+          'redirect_uri' =>  (getenv('REDIRECT_BASEURI') ?: 'https://cloud.scummvm.org').'/onedrive',
         ],
     ],
 ];
