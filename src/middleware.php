@@ -3,6 +3,8 @@
 use Slim\App;
 
 return function (App $app) {
+  if (extension_loaded('redis') && getenv('REDIS_HOST')) {
+
     // e.g: $app->add(new \Slim\Csrf\Guard);
     $redisOptions = [
       'host' => getenv('REDIS_HOST') ?: 'localhost',
@@ -27,4 +29,5 @@ return function (App $app) {
             ]
         )
     );
+  }
 };
