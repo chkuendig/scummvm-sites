@@ -1,6 +1,11 @@
 window.onload = function () {
     connect_cloud();
     document.getElementById("json").value = JSON.stringify(token_json);
+
+    if(window.opener) {
+        // If we have a parent window, we can send the token back to it
+        window.opener.postMessage(token_json,"*")
+    }
 };
 
 function connect_cloud() {

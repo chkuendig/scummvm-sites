@@ -1,3 +1,10 @@
+# For the Webassembly Auth flow to work, we need to setup CORS
+# TODO: Allow-Origin should be restricted to the domain of the app
+<IfModule mod_headers.c>
+  Header set Cross-Origin-Opener-Policy "unsafe-none"
+  Header set Access-Control-Allow-Origin "*" 
+  Header set Access-Control-Allow-Headers "x-scummvm-refresh-token"
+</IfModule>
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
