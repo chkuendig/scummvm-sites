@@ -30,4 +30,12 @@ return function (App $app) {
         )
     );
   }
+  $app->add(function ($req, $res, $next) {
+    $response = $next($req, $res);
+    return $response
+      ->withHeader('Access-Control-Allow-Origin', getenv('SCUMMVM_HOST') ?: '*')
+      ->withHeader('Access-Control-Allow-Headers', 'x-scummvm-refresh-token')
+      ->withHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+      ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  });
 };
